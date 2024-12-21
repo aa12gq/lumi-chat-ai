@@ -40,3 +40,13 @@
 .read-the-docs {
   color: #888;
 }
+
+.model-selector {
+  padding: 12px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.chat-sidebar {
+  display: flex;
+  flex-direction: column;
+}

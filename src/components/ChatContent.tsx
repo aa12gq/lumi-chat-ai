@@ -110,7 +110,11 @@ function getStatusIcon(status: ThoughtChainItem["status"]) {
   }
 }
 
-const ChatContent: React.FC = () => {
+interface ChatContentProps {
+  isDarkMode?: boolean;
+}
+
+const ChatContent: React.FC<ChatContentProps> = ({ isDarkMode }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [loading, setLoading] = useState(false);
@@ -206,12 +210,16 @@ const ChatContent: React.FC = () => {
   }, [messages]);
 
   return (
-    <Layout style={{ height: "100%", background: "#fff" }}>
+    <Layout style={{ 
+      height: "100%", 
+      background: isDarkMode ? '#141414' : '#fff' 
+    }}>
       <Content
         style={{
           height: "100%",
           display: "flex",
           flexDirection: "column",
+          background: isDarkMode ? '#141414' : '#fff'
         }}
       >
         <div
@@ -224,6 +232,7 @@ const ChatContent: React.FC = () => {
             display: "flex",
             flexDirection: "column",
             gap: "16px",
+            background: isDarkMode ? '#141414' : '#fff'
           }}
         >
           {messages.length === 0 ? (
@@ -239,8 +248,9 @@ const ChatContent: React.FC = () => {
             >
               <Welcome
                 style={{
-                  backgroundImage:
-                    "linear-gradient(97deg, #f2f9fe 0%, #f7f3ff 100%)",
+                  backgroundImage: isDarkMode 
+                    ? "linear-gradient(97deg, #141414 0%, #1f1f1f 100%)"
+                    : "linear-gradient(97deg, #f2f9fe 0%, #f7f3ff 100%)",
                   borderRadius: "8px",
                   width: "100%",
                 }}
@@ -253,7 +263,7 @@ const ChatContent: React.FC = () => {
                   style={{
                     margin: 0,
                     fontSize: "16px",
-                    color: "rgba(0, 0, 0, 0.88)",
+                    color: isDarkMode ? '#ffffff' : 'rgba(0, 0, 0, 0.88)',
                   }}
                 >
                   我可以帮您：
@@ -266,13 +276,16 @@ const ChatContent: React.FC = () => {
                     item: {
                       flex: "none",
                       width: "calc(33.33% - 8px)",
-                      backgroundImage:
-                        "linear-gradient(137deg, #e5f4ff 0%, #efe7ff 100%)",
+                      backgroundImage: isDarkMode
+                        ? "linear-gradient(137deg, #1f1f1f 0%, #141414 100%)"
+                        : "linear-gradient(137deg, #e5f4ff 0%, #efe7ff 100%)",
                       border: 0,
+                      color: isDarkMode ? '#ffffff' : 'inherit'
                     },
                     subItem: {
-                      background: "rgba(255,255,255,0.45)",
-                      border: "1px solid #FFF",
+                      background: isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.45)',
+                      border: isDarkMode ? '1px solid #303030' : '1px solid #FFF',
+                      color: isDarkMode ? '#ffffff' : 'inherit'
                     },
                   }}
                 />
@@ -335,9 +348,10 @@ const ChatContent: React.FC = () => {
                 size="small"
                 styles={{
                   item: {
-                    background: "rgba(0, 0, 0, 0.02)",
-                    border: "1px solid #f0f0f0",
+                    background: isDarkMode ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.02)',
+                    border: `1px solid ${isDarkMode ? '#303030' : '#f0f0f0'}`,
                     borderRadius: "8px",
+                    color: isDarkMode ? '#ffffff' : 'inherit'
                   },
                 }}
               />
@@ -347,11 +361,11 @@ const ChatContent: React.FC = () => {
 
         <div
           style={{
-            borderTop: "1px solid #f0f0f0",
+            borderTop: `1px solid ${isDarkMode ? '#303030' : '#f0f0f0'}`,
             padding: "16px",
             paddingLeft: "max(16px, 5%)",
             paddingRight: "max(16px, 5%)",
-            background: "#fff",
+            background: isDarkMode ? '#141414' : '#fff',
           }}
         >
           <div
@@ -371,7 +385,11 @@ const ChatContent: React.FC = () => {
               allowSpeech
               submitType="enter"
               placeholder="输入消息..."
-              style={{ width: "100%" }}
+              style={{ 
+                width: "100%",
+                background: isDarkMode ? '#1f1f1f' : '#fff',
+                color: isDarkMode ? '#ffffff' : 'inherit'
+              }}
             />
           </div>
         </div>
