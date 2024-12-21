@@ -12,6 +12,7 @@ import {
 } from "@ant-design/icons";
 import { Sender, Welcome, Prompts, ThoughtChain } from "@ant-design/x";
 import type { PromptsProps, ThoughtChainItem } from "@ant-design/x";
+import { useLanguage } from "../contexts/LanguageContext";
 
 const { Content } = Layout;
 
@@ -22,100 +23,13 @@ interface Message {
   timestamp: number;
 }
 
-const suggestionItems: PromptsProps["items"] = [
-  {
-    key: "coding",
-    label: (
-      <Space align="start">
-        <CodeOutlined style={{ color: "#1677ff" }} />
-        <span>代码开发</span>
-      </Space>
-    ),
-    description: "编写、优化和调试代码",
-    children: [
-      {
-        key: "coding-react",
-        description: "帮我编写一个 React 组件",
-      },
-      {
-        key: "coding-debug",
-        description: "帮我找出代码中的 bug",
-      },
-      {
-        key: "coding-optimize",
-        description: "如何优化代码性能",
-      },
-    ],
-  },
-  {
-    key: "analysis",
-    label: (
-      <Space align="start">
-        <FileSearchOutlined style={{ color: "#52c41a" }} />
-        <span>数据分析</span>
-      </Space>
-    ),
-    description: "数据处理与可视化",
-    children: [
-      {
-        key: "analysis-data",
-        description: "分析这组数据的趋势",
-      },
-      {
-        key: "analysis-chart",
-        description: "生成数据可视化图表",
-      },
-      {
-        key: "analysis-insight",
-        description: "提供数据洞察建议",
-      },
-    ],
-  },
-  {
-    key: "writing",
-    label: (
-      <Space align="start">
-        <EditOutlined style={{ color: "#722ed1" }} />
-        <span>文案创作</span>
-      </Space>
-    ),
-    description: "创作各类文字内容",
-    children: [
-      {
-        key: "writing-article",
-        description: "写一篇技术博客",
-      },
-      {
-        key: "writing-doc",
-        description: "生成项目文档",
-      },
-      {
-        key: "writing-readme",
-        description: "编写 README 文件",
-      },
-    ],
-  },
-];
-
-function getStatusIcon(status: ThoughtChainItem["status"]) {
-  switch (status) {
-    case "success":
-      return <CheckCircleOutlined style={{ color: "#52c41a" }} />;
-    case "error":
-      return <InfoCircleOutlined style={{ color: "#ff4d4f" }} />;
-    case "pending":
-      return <LoadingOutlined style={{ color: "#1677ff" }} />;
-    default:
-      return undefined;
-  }
-}
-
 interface ChatContentProps {
   isDarkMode?: boolean;
 }
 
 const ChatContent: React.FC<ChatContentProps> = ({ isDarkMode }) => {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const { messages: i18n } = useLanguage();
+  const [chatMessages, setChatMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -135,27 +49,27 @@ const ChatContent: React.FC<ChatContentProps> = ({ isDarkMode }) => {
       timestamp: Date.now(),
     };
 
-    setMessages([...messages, newMessage]);
+    setChatMessages([...chatMessages, newMessage]);
     setInputValue("");
     setLoading(true);
 
     // 模拟 AI 思考过程
     const thoughtProcess: ThoughtChainItem[] = [
       {
-        title: "理解用户意图",
-        description: "分析用户输入，确定问题类型",
+        title: i18n.thoughts.understanding,
+        description: i18n.thoughts.understandingDesc,
         status: "pending",
         icon: getStatusIcon("pending"),
       },
       {
-        title: "检索相关信息",
-        description: "从知识库中搜索相关内容",
+        title: i18n.thoughts.searching,
+        description: i18n.thoughts.searchingDesc,
         status: "pending",
         icon: getStatusIcon("pending"),
       },
       {
-        title: "生成回答",
-        description: "组织语言，生成合适的回复",
+        title: i18n.thoughts.generating,
+        description: i18n.thoughts.generatingDesc,
         status: "pending",
         icon: getStatusIcon("pending"),
       },
@@ -179,7 +93,7 @@ const ChatContent: React.FC<ChatContentProps> = ({ isDarkMode }) => {
         role: "assistant",
         timestamp: Date.now(),
       };
-      setMessages((prev) => [...prev, aiResponse]);
+      setChatMessages((prev) => [...prev, aiResponse]);
       setLoading(false);
       setThoughts([]);
     }, 1000);
@@ -189,15 +103,15 @@ const ChatContent: React.FC<ChatContentProps> = ({ isDarkMode }) => {
     data: NonNullable<PromptsProps["items"]>[number];
   }) => {
     const promptMap: Record<string, string> = {
-      "coding-react": "请帮我编写一个简单的 React 组件，实现一个计数器功能",
-      "coding-debug": "我的代码出现了问题，请帮我找出 bug",
-      "coding-optimize": "请帮我优化这段代码的性能",
-      "analysis-data": "请帮我分析这组数据的趋势和特点",
-      "analysis-chart": "请根据这些数据生成一个图表",
-      "analysis-insight": "请对这些数据提供一些洞察和建议",
-      "writing-article": "请帮我写一篇关于 React 性能优化的技术博客",
-      "writing-doc": "请帮我生成项目文档",
-      "writing-readme": "请帮我编写一个项目的 README 文件",
+      "coding-react": i18n.suggestions.coding.react,
+      "coding-debug": i18n.suggestions.coding.debug,
+      "coding-optimize": i18n.suggestions.coding.optimize,
+      "analysis-data": i18n.suggestions.analysis.data,
+      "analysis-chart": i18n.suggestions.analysis.chart,
+      "analysis-insight": i18n.suggestions.analysis.insight,
+      "writing-article": i18n.suggestions.writing.article,
+      "writing-doc": i18n.suggestions.writing.doc,
+      "writing-readme": i18n.suggestions.writing.readme,
     };
 
     if (promptMap[info.data.key as string]) {
@@ -207,19 +121,109 @@ const ChatContent: React.FC<ChatContentProps> = ({ isDarkMode }) => {
 
   React.useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [chatMessages]);
+
+  const suggestionItems: PromptsProps["items"] = [
+    {
+      key: "coding",
+      label: (
+        <Space align="start">
+          <CodeOutlined style={{ color: "#1677ff" }} />
+          <span>{i18n.suggestions.coding.title}</span>
+        </Space>
+      ),
+      description: i18n.suggestions.coding.description,
+      children: [
+        {
+          key: "coding-react",
+          description: i18n.suggestions.coding.react,
+        },
+        {
+          key: "coding-debug",
+          description: i18n.suggestions.coding.debug,
+        },
+        {
+          key: "coding-optimize",
+          description: i18n.suggestions.coding.optimize,
+        },
+      ],
+    },
+    {
+      key: "analysis",
+      label: (
+        <Space align="start">
+          <FileSearchOutlined style={{ color: "#52c41a" }} />
+          <span>{i18n.suggestions.analysis.title}</span>
+        </Space>
+      ),
+      description: i18n.suggestions.analysis.description,
+      children: [
+        {
+          key: "analysis-data",
+          description: i18n.suggestions.analysis.data,
+        },
+        {
+          key: "analysis-chart",
+          description: i18n.suggestions.analysis.chart,
+        },
+        {
+          key: "analysis-insight",
+          description: i18n.suggestions.analysis.insight,
+        },
+      ],
+    },
+    {
+      key: "writing",
+      label: (
+        <Space align="start">
+          <EditOutlined style={{ color: "#722ed1" }} />
+          <span>{i18n.suggestions.writing.title}</span>
+        </Space>
+      ),
+      description: i18n.suggestions.writing.description,
+      children: [
+        {
+          key: "writing-article",
+          description: i18n.suggestions.writing.article,
+        },
+        {
+          key: "writing-doc",
+          description: i18n.suggestions.writing.doc,
+        },
+        {
+          key: "writing-readme",
+          description: i18n.suggestions.writing.readme,
+        },
+      ],
+    },
+  ];
+
+  function getStatusIcon(status: ThoughtChainItem["status"]) {
+    switch (status) {
+      case "success":
+        return <CheckCircleOutlined style={{ color: "#52c41a" }} />;
+      case "error":
+        return <InfoCircleOutlined style={{ color: "#ff4d4f" }} />;
+      case "pending":
+        return <LoadingOutlined style={{ color: "#1677ff" }} />;
+      default:
+        return undefined;
+    }
+  }
 
   return (
-    <Layout style={{ 
-      height: "100%", 
-      background: isDarkMode ? '#141414' : '#fff' 
-    }}>
+    <Layout
+      style={{
+        height: "100%",
+        background: isDarkMode ? "#141414" : "#fff",
+      }}
+    >
       <Content
         style={{
           height: "100%",
           display: "flex",
           flexDirection: "column",
-          background: isDarkMode ? '#141414' : '#fff'
+          background: isDarkMode ? "#141414" : "#fff",
         }}
       >
         <div
@@ -232,10 +236,10 @@ const ChatContent: React.FC<ChatContentProps> = ({ isDarkMode }) => {
             display: "flex",
             flexDirection: "column",
             gap: "16px",
-            background: isDarkMode ? '#141414' : '#fff'
+            background: isDarkMode ? "#141414" : "#fff",
           }}
         >
-          {messages.length === 0 ? (
+          {chatMessages.length === 0 ? (
             <Flex
               vertical
               gap="large"
@@ -248,25 +252,25 @@ const ChatContent: React.FC<ChatContentProps> = ({ isDarkMode }) => {
             >
               <Welcome
                 style={{
-                  backgroundImage: isDarkMode 
+                  backgroundImage: isDarkMode
                     ? "linear-gradient(97deg, #141414 0%, #1f1f1f 100%)"
                     : "linear-gradient(97deg, #f2f9fe 0%, #f7f3ff 100%)",
                   borderRadius: "8px",
                   width: "100%",
                 }}
                 icon="https://mdn.alipayobjects.com/huamei_iwk9zp/afts/img/A*s5sNRo5LjfQAAAAAAAAAAAAADgCCAQ/fmt.webp"
-                title="欢迎使用 AI 助手"
-                description="我是你的智能助手，可以帮你回答问题、编写代码、分析数据等。让我们开始对话吧！"
+                title={i18n.welcome.title}
+                description={i18n.welcome.description}
               />
               <Flex vertical gap="middle" style={{ width: "100%" }}>
                 <h2
                   style={{
                     margin: 0,
                     fontSize: "16px",
-                    color: isDarkMode ? '#ffffff' : 'rgba(0, 0, 0, 0.88)',
+                    color: isDarkMode ? "#ffffff" : "rgba(0, 0, 0, 0.88)",
                   }}
                 >
-                  我可以帮您：
+                  {i18n.welcome.help}
                 </h2>
                 <Prompts
                   items={suggestionItems}
@@ -280,12 +284,16 @@ const ChatContent: React.FC<ChatContentProps> = ({ isDarkMode }) => {
                         ? "linear-gradient(137deg, #1f1f1f 0%, #141414 100%)"
                         : "linear-gradient(137deg, #e5f4ff 0%, #efe7ff 100%)",
                       border: 0,
-                      color: isDarkMode ? '#ffffff' : 'inherit'
+                      color: isDarkMode ? "#ffffff" : "inherit",
                     },
                     subItem: {
-                      background: isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.45)',
-                      border: isDarkMode ? '1px solid #303030' : '1px solid #FFF',
-                      color: isDarkMode ? '#ffffff' : 'inherit'
+                      background: isDarkMode
+                        ? "rgba(255,255,255,0.08)"
+                        : "rgba(255,255,255,0.45)",
+                      border: isDarkMode
+                        ? "1px solid #303030"
+                        : "1px solid #FFF",
+                      color: isDarkMode ? "#ffffff" : "inherit",
                     },
                   }}
                 />
@@ -302,7 +310,7 @@ const ChatContent: React.FC<ChatContentProps> = ({ isDarkMode }) => {
                 padding: "0 16px",
               }}
             >
-              {messages.map((message) => (
+              {chatMessages.map((message) => (
                 <Flex
                   key={message.id}
                   justify={message.role === "user" ? "flex-end" : "flex-start"}
@@ -348,10 +356,12 @@ const ChatContent: React.FC<ChatContentProps> = ({ isDarkMode }) => {
                 size="small"
                 styles={{
                   item: {
-                    background: isDarkMode ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.02)',
-                    border: `1px solid ${isDarkMode ? '#303030' : '#f0f0f0'}`,
+                    background: isDarkMode
+                      ? "rgba(255, 255, 255, 0.04)"
+                      : "rgba(0, 0, 0, 0.02)",
+                    border: `1px solid ${isDarkMode ? "#303030" : "#f0f0f0"}`,
                     borderRadius: "8px",
-                    color: isDarkMode ? '#ffffff' : 'inherit'
+                    color: isDarkMode ? "#ffffff" : "inherit",
                   },
                 }}
               />
@@ -361,11 +371,11 @@ const ChatContent: React.FC<ChatContentProps> = ({ isDarkMode }) => {
 
         <div
           style={{
-            borderTop: `1px solid ${isDarkMode ? '#303030' : '#f0f0f0'}`,
+            borderTop: `1px solid ${isDarkMode ? "#303030" : "#f0f0f0"}`,
             padding: "16px",
             paddingLeft: "max(16px, 5%)",
             paddingRight: "max(16px, 5%)",
-            background: isDarkMode ? '#141414' : '#fff',
+            background: isDarkMode ? "#141414" : "#fff",
           }}
         >
           <div
@@ -384,11 +394,11 @@ const ChatContent: React.FC<ChatContentProps> = ({ isDarkMode }) => {
               onCancel={() => setLoading(false)}
               allowSpeech
               submitType="enter"
-              placeholder="输入消息..."
-              style={{ 
+              placeholder={i18n.input.placeholder}
+              style={{
                 width: "100%",
-                background: isDarkMode ? '#1f1f1f' : '#fff',
-                color: isDarkMode ? '#ffffff' : 'inherit'
+                background: isDarkMode ? "#1f1f1f" : "#fff",
+                color: isDarkMode ? "#ffffff" : "inherit",
               }}
             />
           </div>
